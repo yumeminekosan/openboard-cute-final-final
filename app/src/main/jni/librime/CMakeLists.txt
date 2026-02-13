@@ -154,7 +154,8 @@ if(X11Keysym)
   message(STATUS "Found X11/keysym.h at ${X11Keysym}")
   include_directories(${X11Keysym})
 else()
-  message(WARNING "X11/keysym.h not found.")
+  message(STATUS "Using local X11/keysym.h for Android")
+  include_directories(${PROJECT_SOURCE_DIR}/src)
 endif()
 
 configure_file(
