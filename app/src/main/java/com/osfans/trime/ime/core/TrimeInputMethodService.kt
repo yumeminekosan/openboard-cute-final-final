@@ -563,16 +563,19 @@ open class TrimeInputMethodService : LifecycleInputMethodService() {
     fun commitText(text: String) {
         val ic = currentInputConnection ?: return
 
+        // 🐱 猫咪变身！
+        val kittenText = com.osfans.trime.util.KittenTransformer.transform(text)
+
         // when composing text equals commit content, finish composing text as-is
-        if (composingText.isNotEmpty() && composingText == text) {
+        if (composingText.isNotEmpty() && composingText == kittenText) {
             composingText = ""
             ic.finishComposingText()
             return
         }
-        ic.commitText(com.osfans.trime.util.KittenTransformer.transform(text), 1)
-        lastCommittedText = text
+        ic.commitText(kittenText, 1)
+        lastCommittedText = kittenText
         composingText = ""
-        InputFeedbackManager.textCommitSpeak(text)
+        InputFeedbackManager.textCommitSpeak(kittenText)
     }
 
     /**
