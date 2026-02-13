@@ -5,6 +5,9 @@
 # if you want to add some new plugins, add them to librime_jni/rime_jni.cc too
 set(RIME_PLUGINS librime-lua librime-octagram librime-predict)
 
+# Add darts include path for librime (prism.h needs darts.h)
+include_directories(${CMAKE_SOURCE_DIR}/OpenCC/deps/darts-clone-0.32)
+
 # symlink plugins
 foreach(plugin ${RIME_PLUGINS})
   if(NOT EXISTS "${CMAKE_SOURCE_DIR}/librime/plugins/${plugin}")
