@@ -28,6 +28,8 @@
 #define XK_Page_Down 0xff56
 #define XK_End 0xff57
 #define XK_Begin 0xff58
+#define XK_Prior 0xff55
+#define XK_Next 0xff56
 
 // Misc functions
 #define XK_Select 0xff60
@@ -57,6 +59,8 @@
 #define XK_KP_Down 0xff99
 #define XK_KP_Page_Up 0xff9a
 #define XK_KP_Page_Down 0xff9b
+#define XK_KP_Prior 0xff9a
+#define XK_KP_Next 0xff9b
 #define XK_KP_End 0xff9c
 #define XK_KP_Begin 0xff9d
 #define XK_KP_Insert 0xff9e
