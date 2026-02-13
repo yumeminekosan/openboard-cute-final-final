@@ -4,11 +4,9 @@
 ** See Copyright Notice in lua.h
 */
 
-/* Android compatibility for fseeko/ftello */
-#ifdef __ANDROID__
-#define fseeko fseeko64
-#define ftello ftello64
-#endif
+/* Android compatibility - fseeko/ftello work with 64-bit on 64-bit Android */
+#define _LARGEFILE_SOURCE
+#define _FILE_OFFSET_BITS 64
 
 #define liolib_c
 #define LUA_LIB
