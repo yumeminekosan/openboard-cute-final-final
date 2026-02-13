@@ -195,4 +195,20 @@
 // Delete
 #define XK_Delete 0xffff
 
+// Japanese keyboard keys
+#define XK_Kanji 0xff21
+#define XK_Muhenkan 0xff22
+#define XK_Henkan_Mode 0xff23
+#define XK_Henkan 0xff23
+#define XK_Romaji 0xff24
+#define XK_Hiragana 0xff25
+#define XK_Katakana 0xff26
+#define XK_Hiragana_Katakana 0xff27
+#define XK_Zenkaku 0xff28
+#define XK_Hankaku 0xff29
+#define XK_Zenkaku_Hankaku 0xff2a
+#define XK_Touroku 0xff2b
+#define XK_Logoff 0xff2c
+#define XK_Eisu_toggle 0xff2f
+
 #endif /* _X11_KEYSYM_H_ */
