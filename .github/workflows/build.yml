@@ -22,7 +22,7 @@ jobs:
       - name: Install SDK components
         run: |
           yes | sdkmanager --licenses || true
-          sdkmanager --install "cmake;3.31.6" "ndk;27.0.12077973" "build-tools;35.0.0" "platforms;android-35"
+          sdkmanager --install "cmake;3.22.1" "ndk;26.3.11579264" "build-tools;35.0.0" "platforms;android-35"
 
       - name: Configure Git
         run: |
@@ -33,9 +33,17 @@ jobs:
       - name: Build Debug APK
         run: |
           chmod +x gradlew
-          ./gradlew :app:assembleDebug --no-daemon --stacktrace
+          ./gradlew :app:assembleDebug --no-daemon --stacktrace 2>&1 | tee build.log
+
+      - name: Upload build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
 
       - uses: actions/upload-artifact@v4
+        if: success()
         with:
           name: kitten-keyboard-apk
           path: app/build/outputs/apk/debug/*.apk
