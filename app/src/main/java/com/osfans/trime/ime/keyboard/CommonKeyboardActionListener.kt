@@ -35,6 +35,7 @@ import com.osfans.trime.ui.main.settings.ColorPickerDialog
 import com.osfans.trime.ui.main.settings.SoundEffectPickerDialog
 import com.osfans.trime.ui.main.settings.ThemePickerDialog
 import com.osfans.trime.util.AppUtils
+import com.osfans.trime.util.CatModeManager
 import com.osfans.trime.util.InputMethodUtils
 import com.osfans.trime.util.buildIntentFromAction
 import com.osfans.trime.util.buildIntentFromArgument
@@ -200,6 +201,7 @@ class CommonKeyboardActionListener {
                     "run" -> handleRunCommand(arg)
                     "share_text" -> service.shareText()
                     "select_candidate" -> handleSelectCandidate(arg)
+                    "cat_mode" -> handleCatMode(arg)
                     else -> handleIntentAction(action.command, arg)
                 }
             }
@@ -270,6 +272,18 @@ class CommonKeyboardActionListener {
                 rime.launchOnReady { api ->
                     service.lifecycleScope.launch {
                         api.selectCandidate(index, false)
+                    }
+                }
+            }
+
+            private fun handleCatMode(arg: String) {
+                when (arg) {
+                    "toggle" -> {
+                        CatModeManager.toggleCatMode()
+                        context.toast(CatModeManager.getStatusText())
+                    }
+                    "status" -> {
+                        context.toast(CatModeManager.getStatusText())
                     }
                 }
             }
