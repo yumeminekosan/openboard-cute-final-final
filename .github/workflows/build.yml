@@ -22,7 +22,7 @@ jobs:
       - name: Install SDK components
         run: |
           yes | sdkmanager --licenses || true
-          sdkmanager --install "cmake;3.22.1" "ndk;26.3.11579264" "build-tools;35.0.0" "platforms;android-35"
+          sdkmanager --install "cmake;3.31.6" "ndk;28.0.13004108" "build-tools;35.0.0" "platforms;android-35"
 
       - name: Configure Git
         run: |
