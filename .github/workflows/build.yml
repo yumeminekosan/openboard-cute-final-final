@@ -22,20 +22,7 @@ jobs:
       - name: Install SDK components
         run: |
           yes | sdkmanager --licenses || true
-          # List available CMake and NDK versions
-          echo "Available CMake versions:"
-          sdkmanager --list 2>/dev/null | grep -i cmake || true
-          echo "Available NDK versions:"
-          sdkmanager --list 2>/dev/null | grep -i ndk || true
-          # Install available versions
-          sdkmanager --install "ndk;28.0.13004108" "build-tools;35.0.0" "platforms;android-35" || true
-
-      - name: Setup CMake
-        run: |
-          # Use system CMake which is more recent on ubuntu-24.04
-          cmake --version
-          # Set CMAKE_VERSION env var to use system cmake
-          echo "CMAKE_VERSION=$(cmake --version | head -1 | cut -d' ' -f3)" >> $GITHUB_ENV
+          sdkmanager --install "cmake;3.31.6" "ndk;27.0.12077973" "build-tools;35.0.0" "platforms;android-35"
 
       - name: Configure Git
         run: |
