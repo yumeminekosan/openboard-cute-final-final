@@ -35,6 +35,13 @@ jobs:
           chmod +x gradlew
           ./gradlew :app:assembleDebug --no-daemon --stacktrace 2>&1 | tee build.log
 
+      - name: List APK files
+        if: always()
+        run: |
+          echo "Searching for APK files..."
+          find app/build/outputs -name "*.apk" || echo "No APK files found"
+          ls -la app/build/outputs/apk/ 2>/dev/null || echo "No apk directory"
+
       - name: Upload build log on failure
         if: failure()
         uses: actions/upload-artifact@v4
@@ -46,4 +53,4 @@ jobs:
         if: success()
         with:
           name: kitten-keyboard-apk
-          path: app/build/outputs/apk/debug/*.apk
+          path: app/build/outputs/apk/**/*.apk
