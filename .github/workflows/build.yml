@@ -19,10 +19,19 @@ jobs:
 
       - uses: android-actions/setup-android@v3
 
-      - name: Install SDK components
+      - name: Install CMake and SDK components
         run: |
+          # 安装系统CMake（最新版）
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build
+          cmake --version
+          
+          # 接受SDK许可
           yes | sdkmanager --licenses || true
-          sdkmanager --install "cmake;3.31.6" "ndk;27.0.12077973" "build-tools;35.0.0" "platforms;android-35"
+          
+          # 安装NDK和其他组件（不通过sdkmanager安装cmake）
+          sdkmanager --install "ndk;28.0.13004108" "build-tools;35.0.0" "platforms;android-35" || true
+          sdkmanager --install "ndk;27.0.12077973" "build-tools;35.0.0" "platforms;android-35" || true
 
       - name: Configure Git
         run: |
@@ -33,6 +42,9 @@ jobs:
       - name: Build Debug APK
         run: |
           chmod +x gradlew
+          # 设置使用系统CMake
+          export CMAKE_VERSION=$(cmake --version | head -1 | cut -d' ' -f3)
+          echo "Using CMake version: $CMAKE_VERSION"
           ./gradlew :app:assembleDebug --no-daemon --stacktrace 2>&1 | tee build.log
 
       - name: List APK files
@@ -41,6 +53,8 @@ jobs:
           echo "Searching for APK files..."
           find app/build/outputs -name "*.apk" || echo "No APK files found"
           ls -la app/build/outputs/apk/ 2>/dev/null || echo "No apk directory"
+          echo "--- Build log tail ---"
+          tail -100 build.log
 
       - name: Upload build log on failure
         if: failure()
