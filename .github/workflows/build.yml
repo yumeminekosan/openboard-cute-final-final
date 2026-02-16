@@ -22,7 +22,8 @@ jobs:
       - name: Install SDK components
         run: |
           yes | sdkmanager --licenses || true
-          sdkmanager --install "cmake;3.31.6" "ndk;27.0.12077973" "build-tools;35.0.0" "platforms;android-35"
+          # 使用可用的CMake版本，项目需要3.31.6但SDK中没有
+          sdkmanager --install "cmake;3.22.1" "ndk;27.0.12077973" "build-tools;35.0.0" "platforms;android-35"
 
       - name: Configure Git
         run: |
@@ -33,6 +34,8 @@ jobs:
       - name: Build Debug APK
         run: |
           chmod +x gradlew
+          # 设置使用SDK中的CMake版本
+          export CMAKE_VERSION=3.22.1
           ./gradlew :app:assembleDebug --no-daemon --stacktrace
 
       - uses: actions/upload-artifact@v4
