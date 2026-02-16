@@ -19,11 +19,35 @@ jobs:
 
       - uses: android-actions/setup-android@v3
 
-      - name: Install SDK components
+      - name: Download prebuilt native libraries
         run: |
-          yes | sdkmanager --licenses || true
-          # 使用可用的CMake版本，项目需要3.31.6但SDK中没有
-          sdkmanager --install "cmake;3.22.1" "ndk;27.0.12077973" "build-tools;35.0.0" "platforms;android-35"
+          # 下载官方Trime release APK来提取预编译的native库
+          mkdir -p app/prebuilt
+          
+          # 下载arm64-v8a版本的APK
+          curl -L -o trime-arm64.apk "https://github.com/osfans/trime/releases/download/v3.3.8/com.osfans.trime-v3.3.8-0-gf3f5c923-arm64-v8a-release.apk"
+          
+          # 解压并提取native库
+          unzip -j trime-arm64.apk "lib/arm64-v8a/*" -d app/prebuilt/arm64-v8a/ || true
+          
+          # 下载armeabi-v7a版本
+          curl -L -o trime-arm.apk "https://github.com/osfans/trime/releases/download/v3.3.8/com.osfans.trime-v3.3.8-0-gf3f5c923-armeabi-v7a-release.apk"
+          
+          unzip -j trime-arm.apk "lib/armeabi-v7a/*" -d app/prebuilt/armeabi-v7a/ || true
+          
+          # 下载x86_64版本
+          curl -L -o trime-x86_64.apk "https://github.com/osfans/trime/releases/download/v3.3.8/com.osfans.trime-v3.3.8-0-gf3f5c923-x86_64-release.apk"
+          
+          unzip -j trime-x86_64.apk "lib/x86_64/*" -d app/prebuilt/x86_64/ || true
+          
+          # 下载x86版本
+          curl -L -o trime-x86.apk "https://github.com/osfans/trime/releases/download/v3.3.8/com.osfans.trime-v3.3.8-0-gf3f5c923-x86-release.apk"
+          
+          unzip -j trime-x86.apk "lib/x86/*" -d app/prebuilt/x86/ || true
+          
+          echo "Prebuilt libraries:"
+          ls -la app/prebuilt/ || true
+          ls -la app/prebuilt/arm64-v8a/ || true
 
       - name: Configure Git
         run: |
@@ -34,8 +58,6 @@ jobs:
       - name: Build Debug APK
         run: |
           chmod +x gradlew
-          # 设置使用SDK中的CMake版本
-          export CMAKE_VERSION=3.22.1
           ./gradlew :app:assembleDebug --no-daemon --stacktrace
 
       - uses: actions/upload-artifact@v4
