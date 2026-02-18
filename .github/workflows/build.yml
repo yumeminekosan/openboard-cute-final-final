@@ -19,55 +19,11 @@ jobs:
 
       - uses: android-actions/setup-android@v3
 
-      - name: Download and extract native libraries
+      - name: Install SDK components
         run: |
-          mkdir -p app/prebuilt
-          
-          echo "Downloading Trime native libraries from official release v3.3.8..."
-          
-          # 从Trime官方release下载各架构APK并提取native库
-          # native库文件名是 librime_jni.so（不是 librime.so）
-          for abi in arm64-v8a armeabi-v7a x86 x86_64; do
-            echo "=== Downloading $abi ==="
-            curl -L -o "trime-${abi}.apk" "https://github.com/osfans/trime/releases/download/v3.3.8/com.osfans.trime-v3.3.8-0-gf3f5c923-${abi}-release.apk" || true
-            
-            if [ -f "trime-${abi}.apk" ]; then
-              mkdir -p "app/prebuilt/${abi}"
-              # APK中native库在lib/<abi>/目录下
-              # 使用unzip -j去掉路径前缀，直接提取到目标目录
-              unzip -j "trime-${abi}.apk" "lib/${abi}/*" -d "app/prebuilt/${abi}/" 2>/dev/null
-              echo "Extracted $abi:"
-              ls -la "app/prebuilt/${abi}/" || true
-            else
-              echo "WARNING: Failed to download $abi APK"
-            fi
-          done
-          
-          # 验证native库是否正确提取
-          echo "=== Checking prebuilt libraries ==="
-          echo "Looking for librime_jni.so (note: filename is librime_jni.so, not librime.so)..."
-          
-          found_libs=0
-          for abi in arm64-v8a armeabi-v7a x86 x86_64; do
-            if [ -f "app/prebuilt/${abi}/librime_jni.so" ]; then
-              echo "✓ Found librime_jni.so for $abi"
-              found_libs=$((found_libs + 1))
-            else
-              echo "✗ Missing librime_jni.so for $abi"
-            fi
-          done
-          
-          echo ""
-          echo "=== Final prebuilt structure ==="
-          find app/prebuilt -name "*.so" -type f -exec ls -lh {} \;
-          
-          if [ $found_libs -eq 0 ]; then
-            echo "ERROR: No native libraries found! APK will crash on launch."
-            exit 1
-          fi
-          
-          echo ""
-          echo "Successfully extracted $found_libs native library architectures"
+          yes | sdkmanager --licenses || true
+          # Use CMake 3.22.1 (stable version available in GitHub Actions)
+          sdkmanager --install "cmake;3.22.1" "ndk;26.3.11579264" "build-tools;35.0.0" "platforms;android-35"
 
       - name: Configure Git
         run: |
