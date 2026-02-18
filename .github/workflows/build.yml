@@ -23,47 +23,51 @@ jobs:
         run: |
           mkdir -p app/prebuilt
           
-          # 使用最新nightly build
-          echo "Downloading Trime native libraries..."
+          echo "Downloading Trime native libraries from official release v3.3.8..."
           
-          # 获取最新的nightly artifact
-          # 使用v3.3.8作为备选
+          # 从Trime官方release下载各架构APK并提取native库
+          # native库文件名是 librime_jni.so（不是 librime.so）
           for abi in arm64-v8a armeabi-v7a x86 x86_64; do
-            echo "Downloading $abi..."
+            echo "=== Downloading $abi ==="
             curl -L -o "trime-${abi}.apk" "https://github.com/osfans/trime/releases/download/v3.3.8/com.osfans.trime-v3.3.8-0-gf3f5c923-${abi}-release.apk" || true
             
             if [ -f "trime-${abi}.apk" ]; then
               mkdir -p "app/prebuilt/${abi}"
-              # APK中native库在lib/<abi>/目录
-              unzip -j "trime-${abi}.apk" "lib/${abi}/*" -d "app/prebuilt/${abi}/" 2>/dev/null || \
-              unzip -j "trime-${abi}.apk" -d "app/prebuilt/${abi}/" 2>/dev/null || true
+              # APK中native库在lib/<abi>/目录下
+              # 使用unzip -j去掉路径前缀，直接提取到目标目录
+              unzip -j "trime-${abi}.apk" "lib/${abi}/*" -d "app/prebuilt/${abi}/" 2>/dev/null
               echo "Extracted $abi:"
               ls -la "app/prebuilt/${abi}/" || true
+            else
+              echo "WARNING: Failed to download $abi APK"
             fi
           done
           
-          # 检查是否有.so文件
-          echo "Checking prebuilt libraries..."
-          find app/prebuilt -name "*.so" || echo "No .so files found!"
+          # 验证native库是否正确提取
+          echo "=== Checking prebuilt libraries ==="
+          echo "Looking for librime_jni.so (note: filename is librime_jni.so, not librime.so)..."
           
-          # 如果没有找到，尝试另一种方式
-          if [ ! -f "app/prebuilt/arm64-v8a/librime.so" ]; then
-            echo "Trying alternative extraction..."
-            # 下载universal APK
-            curl -L -o trime-universal.apk "https://github.com/osfans/trime/releases/download/v3.3.8/com.osfans.trime-v3.3.8-0-gf3f5c923-universal-release.apk" || true
-            if [ -f "trime-universal.apk" ]; then
-              unzip trime-universal.apk -d trime-extracted/ || true
-              for abi in arm64-v8a armeabi-v7a x86 x86_64; do
-                if [ -d "trime-extracted/lib/${abi}" ]; then
-                  mkdir -p "app/prebuilt/${abi}"
-                  cp -r trime-extracted/lib/${abi}/* "app/prebuilt/${abi}/" || true
-                fi
-              done
+          found_libs=0
+          for abi in arm64-v8a armeabi-v7a x86 x86_64; do
+            if [ -f "app/prebuilt/${abi}/librime_jni.so" ]; then
+              echo "✓ Found librime_jni.so for $abi"
+              found_libs=$((found_libs + 1))
+            else
+              echo "✗ Missing librime_jni.so for $abi"
             fi
+          done
+          
+          echo ""
+          echo "=== Final prebuilt structure ==="
+          find app/prebuilt -name "*.so" -type f -exec ls -lh {} \;
+          
+          if [ $found_libs -eq 0 ]; then
+            echo "ERROR: No native libraries found! APK will crash on launch."
+            exit 1
           fi
           
-          echo "Final prebuilt structure:"
-          find app/prebuilt -name "*.so" -type f || echo "ERROR: No .so files found!"
+          echo ""
+          echo "Successfully extracted $found_libs native library architectures"
 
       - name: Configure Git
         run: |
