@@ -4,9 +4,13 @@
 ** See Copyright Notice in lua.h
 */
 
-/* Android compatibility - fseeko/ftello work with 64-bit on 64-bit Android */
-#define _LARGEFILE_SOURCE
-#define _FILE_OFFSET_BITS 64
+/* Android compatibility - use fseek/ftell instead of fseeko/ftello for NDK 28+ compatibility */
+/* NDK 28 removed fseeko/ftello declarations even with _LARGEFILE_SOURCE */
+#ifdef __ANDROID__
+#define l_fseek(f,o,w)          fseek(f,o,w)
+#define l_ftell(f)              ftell(f)
+#define l_seeknum               long
+#endif
 
 #define liolib_c
 #define LUA_LIB
