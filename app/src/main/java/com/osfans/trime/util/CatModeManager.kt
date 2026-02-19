@@ -139,6 +139,7 @@ object CatModeManager {
                 when (char) {
                     '我' -> result.append("猫")
                     '个' -> result.append("只")
+                    '你' -> result.append("人")  // 你 → 人
                     '他' -> result.append("人")  // 他 → 人
                     '她' -> result.append("人")  // 她 → 人
                     // 注意："它"不转换，动物的ta保持原样
